@@ -1,28 +1,37 @@
-#include <iostream>
-#include <type_traits>
+#include <stdio.h>
 
-template <typename T>
-T min(T a, T b) {
-	if (a < b) {
-		return static_cast<T>(a);;
-	}
-	else {
-		return static_cast<T>(b);
-	}
+float NormalWages(float time) {
+	return 1072 * time;
 }
 
-template<>
-char min<char>(char a, char b) {
-	printf ("数字以外は入力できません");
-	return 0;
+float RecursionHourlyWages(float time) {
+	if (time <= 1.0f) {
+		return 100.0f;
+	}
+	return RecursionHourlyWages(time - 1) * 2.0f - 50.0f;
+}
+
+float RecursionTotalWages(float time) {
+	if (time <= 1.0f) {
+		return RecursionHourlyWages(1.0f);
+	}
+	return RecursionHourlyWages(time) + RecursionTotalWages(time - 1);
+}
+
+void WagesCalculation(float time) {
+	if (NormalWages(time) < RecursionTotalWages(time)) {
+		printf("%.0f時間だと再帰的賃金のほうが高い\n", time);
+	}
+	else {
+		printf("%.0f時間だと一般的賃金のほうが高い\n", time);
+	}
 }
 
 int main() {
-
-	printf("%d\n", min<int>(114, 514));
-	printf("%f\n", min<float>(11.4f, 51.4f));
-	printf("%lf\n", min<double>(11.4, 51.4));
-	printf("%c\n", min<char>('A', 'B'));
+	WagesCalculation(6.0f);
+	WagesCalculation(7.0f);
+	WagesCalculation(8.0f);
+	WagesCalculation(9.0f);
 
 	return 0;
 }

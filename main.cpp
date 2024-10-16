@@ -1,37 +1,70 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+#include <Windows.h>
 
-float NormalWages(float time) {
-	return 1072 * time;
-}
+typedef void (*PFunc)(int*);
 
-float RecursionHourlyWages(float time) {
-	if (time <= 1.0f) {
-		return 100.0f;
-	}
-	return RecursionHourlyWages(time - 1) * 2.0f - 50.0f;
-}
+int userGuess;
 
-float RecursionTotalWages(float time) {
-	if (time <= 1.0f) {
-		return RecursionHourlyWages(1.0f);
-	}
-	return RecursionHourlyWages(time) + RecursionTotalWages(time - 1);
-}
-
-void WagesCalculation(float time) {
-	if (NormalWages(time) < RecursionTotalWages(time)) {
-		printf("%.0f時間だと再帰的賃金のほうが高い\n", time);
+// サイコロの出目が奇数か偶数かを判定する関数
+void isEven(int *number) {
+	if (*number % 2 == 0) {
+		if (userGuess == 2) {
+			printf("正解！ サイコロの出目は%dです\n", *number);
+		}
+		else {
+			printf("不正解。 サイコロの出目は%dです\n", *number);
+		}
 	}
 	else {
-		printf("%.0f時間だと一般的賃金のほうが高い\n", time);
+		if (userGuess == 1) {
+			printf("正解！ サイコロの出目は%dです\n", *number);
+		}
+		else {
+			printf("不正解。 サイコロの出目は%dです\n", *number);
+		}
 	}
+}
+
+void SetTimeout(PFunc p, int second, int number) {
+	Sleep(second * 1000);
+
+	p(&number);
 }
 
 int main() {
-	WagesCalculation(6.0f);
-	WagesCalculation(7.0f);
-	WagesCalculation(8.0f);
-	WagesCalculation(9.0f);
+	// ランダムシードの初期化
+	srand(static_cast<unsigned int>(time(0)));
+
+	PFunc func;
+
+	while (true) {
+		// サイコロを振る
+		int diceRoll = rand() % 6 + 1;
+
+		printf("サイコロの目が奇数か偶数かあててください（奇数: 1, 偶数: 2）: ");
+
+		scanf_s("%d", &userGuess);
+
+		if (userGuess != 1 && userGuess != 2) {
+			printf("1 (奇数) または2 (偶数) を入力してください。\n");
+			continue;
+		}
+
+		func = &isEven;
+		SetTimeout(func, 3, diceRoll);
+
+		printf("もう一度やりますか？ (はい: 1, いいえ: 0) : ");
+		int playAgain;
+		scanf_s("%d", &playAgain);
+
+		if (playAgain != 1) {
+			break;
+		}
+	}
+
+	printf("\nゲームを終了します。ありがとうございました！\n");
 
 	return 0;
 }

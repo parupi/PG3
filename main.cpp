@@ -2,42 +2,20 @@
 #include <stdlib.h>
 #include <time.h>
 #include <Windows.h>
+#include <functional>
 
-typedef void (*PFunc)(int*);
-
-int userGuess;
-
-// サイコロの出目が奇数か偶数かを判定する関数
-void isEven(int *number) {
-	if (*number % 2 == 0) {
-		if (userGuess == 2) {
-			printf("正解！ サイコロの出目は%dです\n", *number);
-		}
-		else {
-			printf("不正解。 サイコロの出目は%dです\n", *number);
-		}
-	}
-	else {
-		if (userGuess == 1) {
-			printf("正解！ サイコロの出目は%dです\n", *number);
-		}
-		else {
-			printf("不正解。 サイコロの出目は%dです\n", *number);
-		}
-	}
-}
-
-void SetTimeout(PFunc p, int second, int number) {
+// 指定した秒数後に関数を実行するSetTimeout関数
+void SetTimeout(std::function<void(int*)> func, int second, int number) {
 	Sleep(second * 1000);
-
-	p(&number);
+	func(&number);
 }
 
 int main() {
 	// ランダムシードの初期化
 	srand(static_cast<unsigned int>(time(0)));
 
-	PFunc func;
+	//PFunc func;
+	int userGuess;
 
 	while (true) {
 		// サイコロを振る
@@ -52,8 +30,28 @@ int main() {
 			continue;
 		}
 
-		func = &isEven;
-		SetTimeout(func, 3, diceRoll);
+		// ラムダ式で判定ロジックを定義
+		auto isEven = [userGuess](int* number) {
+			if (*number % 2 == 0) {
+				if (userGuess == 2) {
+					printf("正解！ サイコロの出目は%dです\n", *number);
+				}
+				else {
+					printf("不正解。 サイコロの出目は%dです\n", *number);
+				}
+			}
+			else {
+				if (userGuess == 1) {
+					printf("正解！ サイコロの出目は%dです\n", *number);
+				}
+				else {
+					printf("不正解。 サイコロの出目は%dです\n", *number);
+				}
+			}
+			};
+
+		//func = &isEven;
+		SetTimeout(isEven, 3, diceRoll);
 
 		printf("もう一度やりますか？ (はい: 1, いいえ: 0) : ");
 		int playAgain;

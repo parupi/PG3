@@ -1,46 +1,62 @@
 #include <cstdio>
 
-// 2つの異なる型 T1, T2 に対応するクラステンプレート
-template <typename T1, typename T2>
-class Comparator {
+// 基底クラス：スマートフォン
+class Smartphone {
 public:
-    // コンストラクタで2つの値を受け取る
-    Comparator(T1 a, T2 b) : value1(a), value2(b) {}
+    virtual void ShowManufacturer() const = 0; // 純粋仮想関数（製造元を表示）
+    virtual ~Smartphone() {}                   // 仮想デストラクタ
+};
 
-private:
-    T1 value1;
-    T2 value2;
+// 派生クラス：iPhone
+class iPhone : public Smartphone {
 public:
-    // Min関数：2つの値のうち小さい方を返す（共通の型にキャストして比較）
-    auto Min() const -> decltype(value1 < value2 ? value1 : value2) {
-        return (value1 < value2) ? value1 : value2;
+    void ShowManufacturer() const override {
+        printf("iPhone の製造元: Apple\n");
+    }
+};
+
+// 派生クラス：Galaxy
+class Galaxy : public Smartphone {
+public:
+    void ShowManufacturer() const override {
+        printf("Galaxy の製造元: Samsung\n");
+    }
+};
+
+// 派生クラス：Xperia
+class Xperia : public Smartphone {
+public:
+    void ShowManufacturer() const override {
+        printf("Xperia の製造元: Sony\n");
+    }
+};
+
+// 派生クラス：Pixel
+class Pixel : public Smartphone {
+public:
+    void ShowManufacturer() const override {
+        printf("Pixel の製造元: Google\n");
     }
 };
 
 int main() {
-    // int型とint型のインスタンス
-    Comparator<int, int> intIntComp(10, 20);
-    printf("int型とint型の小さい値: %d\n", intIntComp.Min());
+    // 各スマートフォンのインスタンスを生成
+    Smartphone* iphone = new iPhone();
+    Smartphone* galaxy = new Galaxy();
+    Smartphone* xperia = new Xperia();
+    Smartphone* pixel = new Pixel();
 
-    // int型とfloat型のインスタンス
-    Comparator<int, float> intFloatComp(15, 7.2f);
-    printf("int型とfloat型の小さい値: %.2f\n", intFloatComp.Min());
+    // ポリモーフィズムを使用して、それぞれの「ShowManufacturer」メソッドを呼び出す
+    iphone->ShowManufacturer();
+    galaxy->ShowManufacturer();
+    xperia->ShowManufacturer();
+    pixel->ShowManufacturer();
 
-    // float型とdouble型のインスタンス
-    Comparator<float, double> floatDoubleComp(10.5f, 20.75);
-    printf("float型とdouble型の小さい値: %.2f\n", floatDoubleComp.Min());
-
-    // double型とint型のインスタンス
-    Comparator<double, int> doubleIntComp(5.5, 3);
-    printf("double型とint型の小さい値: %.2f\n", doubleIntComp.Min());
-
-    // int型とdouble型のインスタンス
-    Comparator<int, double> intDoubleComp(8, 10.1);
-    printf("int型とdouble型の小さい値: %.2f\n", intDoubleComp.Min());
-
-    // double型とdouble型のインスタンス
-    Comparator<double, double> doubleDoubleComp(7.34, 10.1);
-    printf("double型とdouble型の小さい値: %.2f\n", intDoubleComp.Min());
+    // メモリの解放
+    delete iphone;
+    delete galaxy;
+    delete xperia;
+    delete pixel;
 
     return 0;
 }

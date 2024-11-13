@@ -1,44 +1,46 @@
-#include <iostream>
 #include <cstdio>
-#include <functional>
 
-class Enemy {
+// 2つの異なる型 T1, T2 に対応するクラステンプレート
+template <typename T1, typename T2>
+class Comparator {
 public:
-    Enemy() : currentState(&Enemy::approach) {}
-
-    // 状態遷移の関数
-    void update() {
-        (this->*currentState)();
-    }
+    // コンストラクタで2つの値を受け取る
+    Comparator(T1 a, T2 b) : value1(a), value2(b) {}
 
 private:
-    // 各状態を表すメンバ関数
-    void approach() {
-        printf("敵が接近中...\n");
-        currentState = &Enemy::shoot; // 次の状態に遷移
+    T1 value1;
+    T2 value2;
+public:
+    // Min関数：2つの値のうち小さい方を返す（共通の型にキャストして比較）
+    auto Min() const -> decltype(value1 < value2 ? value1 : value2) {
+        return (value1 < value2) ? value1 : value2;
     }
-
-    void shoot() {
-        printf("敵が射撃中！\n");
-        currentState = &Enemy::retreat; // 次の状態に遷移
-    }
-
-    void retreat() {
-        printf("敵が離脱中...\n");
-        currentState = &Enemy::approach; // 最初の状態に戻る
-    }
-
-    // 現在の状態を指すメンバ関数ポインタ
-    void (Enemy::* currentState)();
 };
 
 int main() {
-    Enemy enemy;
+    // int型とint型のインスタンス
+    Comparator<int, int> intIntComp(10, 20);
+    printf("int型とint型の小さい値: %d\n", intIntComp.Min());
 
-    // 何回か状態を更新してみる
-    for (int i = 0; i < 6; ++i) {
-        enemy.update();
-    }
+    // int型とfloat型のインスタンス
+    Comparator<int, float> intFloatComp(15, 7.2f);
+    printf("int型とfloat型の小さい値: %.2f\n", intFloatComp.Min());
+
+    // float型とdouble型のインスタンス
+    Comparator<float, double> floatDoubleComp(10.5f, 20.75);
+    printf("float型とdouble型の小さい値: %.2f\n", floatDoubleComp.Min());
+
+    // double型とint型のインスタンス
+    Comparator<double, int> doubleIntComp(5.5, 3);
+    printf("double型とint型の小さい値: %.2f\n", doubleIntComp.Min());
+
+    // int型とdouble型のインスタンス
+    Comparator<int, double> intDoubleComp(8, 10.1);
+    printf("int型とdouble型の小さい値: %.2f\n", intDoubleComp.Min());
+
+    // double型とdouble型のインスタンス
+    Comparator<double, double> doubleDoubleComp(7.34, 10.1);
+    printf("double型とdouble型の小さい値: %.2f\n", intDoubleComp.Min());
 
     return 0;
 }

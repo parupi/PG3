@@ -1,62 +1,70 @@
 #include <cstdio>
+#include <cmath>
 
-// 基底クラス：スマートフォン
-class Smartphone {
+// 抽象クラス IShape
+class IShape {
 public:
-    virtual void ShowManufacturer() const = 0; // 純粋仮想関数（製造元を表示）
-    virtual ~Smartphone() {}                   // 仮想デストラクタ
+    virtual void Size() = 0; // 面積を求める純粋仮想関数
+    virtual void Draw() const = 0; // 面積を表示する純粋仮想関数
+    virtual ~IShape() {} // 仮想デストラクタ
 };
 
-// 派生クラス：iPhone
-class iPhone : public Smartphone {
+// Circle クラス（円）
+class Circle : public IShape {
 public:
-    void ShowManufacturer() const override {
-        printf("iPhone の製造元: Apple\n");
+    Circle(double radius) : radius(radius), area(0) {}
+
+    // 面積を計算
+    void Size() override {
+        area = 3.14 * radius * radius; // πr^2
     }
+
+    // 面積を表示
+    void Draw() const override {
+        printf("円の面積: %.2f\n", area);
+    }
+
+private:
+    double radius;
+    double area;
 };
 
-// 派生クラス：Galaxy
-class Galaxy : public Smartphone {
+// Rectangle クラス（矩形）
+class Rectangle : public IShape {
 public:
-    void ShowManufacturer() const override {
-        printf("Galaxy の製造元: Samsung\n");
-    }
-};
+    Rectangle(double width, double height) : width(width), height(height), area(0) {}
 
-// 派生クラス：Xperia
-class Xperia : public Smartphone {
-public:
-    void ShowManufacturer() const override {
-        printf("Xperia の製造元: Sony\n");
+    // 面積を計算
+    void Size() override {
+        area = width * height; // 縦×横
     }
-};
 
-// 派生クラス：Pixel
-class Pixel : public Smartphone {
-public:
-    void ShowManufacturer() const override {
-        printf("Pixel の製造元: Google\n");
+    // 面積を表示
+    void Draw() const override {
+        printf("矩形の面積: %.2f\n", area);
     }
+
+private:
+    double width;
+    double height;
+    double area;
 };
 
 int main() {
-    // 各スマートフォンのインスタンスを生成
-    Smartphone* iphone = new iPhone();
-    Smartphone* galaxy = new Galaxy();
-    Smartphone* xperia = new Xperia();
-    Smartphone* pixel = new Pixel();
+    // 円と矩形のインスタンスを生成
+    IShape* circle = new Circle(5.0);   // 半径5の円
+    IShape* rectangle = new Rectangle(4.0, 3.0); // 幅4、高さ3の矩形
 
-    // ポリモーフィズムを使用して、それぞれの「ShowManufacturer」メソッドを呼び出す
-    iphone->ShowManufacturer();
-    galaxy->ShowManufacturer();
-    xperia->ShowManufacturer();
-    pixel->ShowManufacturer();
+    // 面積を計算して表示
+    circle->Size();
+    circle->Draw();
 
-    // メモリの解放
-    delete iphone;
-    delete galaxy;
-    delete xperia;
-    delete pixel;
+    rectangle->Size();
+    rectangle->Draw();
+
+    // メモリ解放
+    delete circle;
+    delete rectangle;
 
     return 0;
 }

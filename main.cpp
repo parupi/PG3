@@ -1,60 +1,27 @@
 #include <iostream>
-#include <fstream>
-#include <vector>
 #include <string>
-#include <sstream>
-#include <thread>
-#include <mutex>
-
-std::vector<std::vector<int>> mapData; // マップデータを格納
-std::mutex mtx; // データ競合を防ぐためのミューテックス
-
-// CSVファイルを読み込む関数
-void loadMap(const std::string& filename) {
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return;
-    }
-
-    std::string line;
-    while (std::getline(file, line)) {
-        std::vector<int> row;
-        std::istringstream iss(line);
-        std::string value;
-        while (std::getline(iss, value, ',')) {
-            row.push_back(std::stoi(value)); // 数字として変換して格納
-        }
-
-        std::lock_guard<std::mutex> lock(mtx); // マップデータへのアクセスを保護
-        mapData.push_back(row);
-    }
-
-    file.close();
-}
-
-// マップデータを出力する関数
-void printMap() {
-    std::lock_guard<std::mutex> lock(mtx); // データアクセスを保護
-    for (const auto& row : mapData) {
-        for (const auto& cell : row) {
-            std::cout << cell << " ";
-        }
-        std::cout << std::endl;
-    }
-}
+#include <chrono>
 
 int main() {
-    std::string filename = "map.csv"; // マップデータファイル名
+    // 100,000文字の'a'で初期化された文字列
+    std::string largeString(100000, 'a');
 
-    // CSVファイルを読み込むスレッドを作成
-    std::thread loader(loadMap, filename);
+    // コピー操作の時間計測
+    auto startCopy = std::chrono::high_resolution_clock::now();
+    std::string copiedString = largeString; // コピー
+    auto endCopy = std::chrono::high_resolution_clock::now();
+    auto copyDuration = std::chrono::duration_cast<std::chrono::microseconds>(endCopy - startCopy).count();
 
-    // スレッドが完了するのを待機
-    loader.join();
+    // 移動操作の時間計測
+    auto startMove = std::chrono::high_resolution_clock::now();
+    std::string movedString = std::move(largeString); // 移動
+    auto endMove = std::chrono::high_resolution_clock::now();
+    auto moveDuration = std::chrono::duration_cast<std::chrono::microseconds>(endMove - startMove).count();
 
-    // 読み込んだマップデータを出力
-    printMap();
+    // 結果を表示
+    std::cout << "100,000文字を移動とコピーで比較しました。\n";
+    std::cout << "コピー: " << copyDuration << "μs\n";
+    std::cout << "移動: " << moveDuration << "μs\n";
 
     return 0;
 }

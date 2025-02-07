@@ -1,28 +1,60 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <string>
+#include <sstream>
 #include <thread>
 #include <mutex>
-#include <condition_variable>
 
-std::mutex mtx;
-std::condition_variable cv;
-int current_thread = 1;
+std::vector<std::vector<int>> mapData; // マップデータを格納
+std::mutex mtx; // データ競合を防ぐためのミューテックス
 
-void print_thread(int thread_id) {
-    std::unique_lock<std::mutex> lock(mtx);
-    cv.wait(lock, [thread_id]() { return current_thread == thread_id; });
-    std::cout << "thread " << thread_id << std::endl;
-    current_thread++;
-    cv.notify_all();
+// CSVファイルを読み込む関数
+void loadMap(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(file, line)) {
+        std::vector<int> row;
+        std::istringstream iss(line);
+        std::string value;
+        while (std::getline(iss, value, ',')) {
+            row.push_back(std::stoi(value)); // 数字として変換して格納
+        }
+
+        std::lock_guard<std::mutex> lock(mtx); // マップデータへのアクセスを保護
+        mapData.push_back(row);
+    }
+
+    file.close();
+}
+
+// マップデータを出力する関数
+void printMap() {
+    std::lock_guard<std::mutex> lock(mtx); // データアクセスを保護
+    for (const auto& row : mapData) {
+        for (const auto& cell : row) {
+            std::cout << cell << " ";
+        }
+        std::cout << std::endl;
+    }
 }
 
 int main() {
-    std::thread t1(print_thread, 1);
-    std::thread t2(print_thread, 2);
-    std::thread t3(print_thread, 3);
+    std::string filename = "map.csv"; // マップデータファイル名
 
-    t1.join();
-    t2.join();
-    t3.join();
+    // CSVファイルを読み込むスレッドを作成
+    std::thread loader(loadMap, filename);
+
+    // スレッドが完了するのを待機
+    loader.join();
+
+    // 読み込んだマップデータを出力
+    printMap();
 
     return 0;
 }

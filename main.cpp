@@ -21,8 +21,7 @@ float RecursionTotalWages(float time) {
 void WagesCalculation(float time) {
 	if (NormalWages(time) < RecursionTotalWages(time)) {
 		printf("%.0f時間だと再帰的賃金のほうが高い\n", time);
-	}
-	else {
+	} else {
 		printf("%.0f時間だと一般的賃金のほうが高い\n", time);
 	}
 }

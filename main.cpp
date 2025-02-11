@@ -8,20 +8,17 @@ typedef void (*PFunc)(int*);
 int userGuess;
 
 // サイコロの出目が奇数か偶数かを判定する関数
-void isEven(int *number) {
+void isEven(int* number) {
 	if (*number % 2 == 0) {
 		if (userGuess == 2) {
 			printf("正解！ サイコロの出目は%dです\n", *number);
-		}
-		else {
+		} else {
 			printf("不正解。 サイコロの出目は%dです\n", *number);
 		}
-	}
-	else {
+	} else {
 		if (userGuess == 1) {
 			printf("正解！ サイコロの出目は%dです\n", *number);
-		}
-		else {
+		} else {
 			printf("不正解。 サイコロの出目は%dです\n", *number);
 		}
 	}

@@ -35,16 +35,13 @@ int main() {
 			if (*number % 2 == 0) {
 				if (userGuess == 2) {
 					printf("正解！ サイコロの出目は%dです\n", *number);
-				}
-				else {
+				} else {
 					printf("不正解。 サイコロの出目は%dです\n", *number);
 				}
-			}
-			else {
+			} else {
 				if (userGuess == 1) {
 					printf("正解！ サイコロの出目は%dです\n", *number);
-				}
-				else {
+				} else {
 					printf("不正解。 サイコロの出目は%dです\n", *number);
 				}
 			}
